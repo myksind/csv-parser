@@ -34,10 +34,14 @@ class App extends Component {
 }
 
 const TableRow = ({ row }) => (
-  <tr>{row.map(cell => <td key={cell}>{cell}</td>)}</tr>
+  <tr>{row.map((cell, index) => <td key={index}>{cell}</td>)}</tr>
 );
 const Table = ({ data }) => (
-  <table>{data.map(row => <TableRow row={row} />)}</table>
+  <table>
+    <tbody>
+      {data.map((row, index) => <TableRow key={index} row={row} />)}
+    </tbody>
+  </table>
 );
 
 export default App;
