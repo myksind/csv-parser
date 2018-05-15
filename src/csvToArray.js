@@ -3,37 +3,67 @@ const csvToArray = text => {
     row = [''],
     result = [row],
     i = 0,
-    cells = 0,
     r = 0,
     double = true,
+    maxLength = 0,
     letter;
 
-  for (letter in text) {
-    letter = text[letter];
+  for (let index in text) {
+    letter = text[index];
     //Finds the beginning and ending of double quates and escapes
     if ('"' === letter) {
       if (double && letter === p) row[i] += letter;
       double = !double;
     }
     //Handles empty spaces
-    else if ((' ' === letter) & double) row[i] += letter;
+    else if (' ' === letter && double) row[i] += letter;
     //Finds the comma separator and writes empty string at the end
     else if (',' === letter && double) letter = row[++i] = '';
     //Finds the ending line and starts new row
     else if ('\n' === letter && double) {
-      if ('\r' === p) row[i] = row[i].slice(0, -1);
-      row = result[++r] = [(letter = '')];
-      cells += 1;
+      if (text.length - 1 + '' !== index) row = result[++r] = [(letter = '')];
       i = 0;
     } else row[i] += letter;
     p = letter;
   }
+  const max = result.reduce((acu, current) => {
+    return Math.max(acu, current.length);
+  }, 0);
 
-  console.log(cells);
-  return result;
+  return result.map(row => {
+    if (row.length !== max) {
+      for (let b = 0; b < max - row.length; b++) {
+        row.push('');
+      }
+    }
+    return row;
+  });
 };
 
-export default csvToArray;
+const testCases = [
+  ['a,b,c \n d,e,f', [['a', 'b', 'c '], [' d', 'e', 'f']]],
+  ['a,b,c \n d,e,f\n', [['a', 'b', 'c '], [' d', 'e', 'f']]],
+  ['a,b,c \n d,e', [['a', 'b', 'c '], [' d', 'e', '']]],
+  ['"a",b,"c" \n d,e,f', [['a', 'b', 'c '], [' d', 'e', 'f']]],
+  ['"a","b \nh","c" \n "d","e","f"', [['a', 'b h', 'c '], [' d', 'e', 'f']]],
+  ['"a","b"""" h","c" \n "d","e","f"', [['a', 'b"" h', 'c '], [' d', 'e', 'f']]]
+];
+
+const compare = (input, output) => {
+  if (JSON.stringify(input) !== JSON.stringify(output)) {
+    console.log('Expected', input);
+    console.log('Ouput', output);
+    console.log('fail');
+  }
+};
+
+const test = () => {
+  testCases.forEach(([input, output]) => compare(output, csvToArray(input)));
+};
+
+test();
+
+// export default csvToArray;
 
 // 1.  Each record is located on a separate line, delimited by a line
 //        break (CRLF).  For example:
